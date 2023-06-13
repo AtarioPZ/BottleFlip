@@ -34,6 +34,10 @@ is_jumping = False
 flip_angle = 0
 flip_speed = 10
 
+# Set up the score
+score = 0
+counting_score = False
+
 # Set up the clock
 clock = pygame.time.Clock()
 
@@ -64,6 +68,7 @@ while running:
             elif game_started and event.key == pygame.K_SPACE and not is_jumping:
                 velocity = -10
                 is_jumping = True
+                counting_score = True
             elif event.key == pygame.K_ESCAPE:
                 running = False
         elif event.type == pygame.KEYUP:
@@ -78,6 +83,11 @@ while running:
     if bottle_y >= window_height - bottle_height:
         velocity = 0
         bottle_y = window_height - bottle_height
+
+        # Check if the bottle has landed upright
+        if flip_angle == 0 and counting_score:
+            score += 1
+            counting_score = False
 
     # Rotate the bottle for flip animation
     if is_jumping:
@@ -105,6 +115,11 @@ while running:
         # Draw the bottle
         bottle_rect = rotated_bottle.get_rect(center=(bottle_x + bottle_width // 2, bottle_y + bottle_height // 2))
         window.blit(rotated_bottle, bottle_rect)
+
+        # Draw the score
+        score_text = font.render("Score: " + str(score), True, black)
+        score_text_rect = score_text.get_rect(topright=(window_width - 10, 10))
+        window.blit(score_text, score_text_rect)
 
     # Update the display
     pygame.display.flip()
