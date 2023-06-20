@@ -41,6 +41,16 @@ counting_score = False
 # Set up the rotation counter
 rotation_counter = 0
 
+# Set up the maximum number of flips
+max_flips = 10
+remaining_flips = max_flips
+
+# Set up the game over state
+game_over = False
+
+# Set up the restart state
+restart = False
+
 # Set up the clock
 clock = pygame.time.Clock()
 
@@ -48,14 +58,15 @@ clock = pygame.time.Clock()
 font = pygame.font.SysFont(None, 36)
 
 # Display the instructions message
-instruction_message = "Hold SPACEBAR to flip the bottle and land it upright correctly"
+instruction_message = "Hold 'spacebar' to flip bottle"
+enter_message = "Press 'enter' to start"
+exit_message = "Press 'escape' to quit game"
 instruction_text = font.render(instruction_message, True, black)
-instruction_text_rect = instruction_text.get_rect(center=(window_width // 2, window_height // 2))
-
-# Display the start message
-start_message = "Press ENTER to start"
-start_text = font.render(start_message, True, black)
-start_text_rect = start_text.get_rect(center=(window_width // 2, window_height // 2 + 40))
+enter_text = font.render(enter_message, True, black)
+exit_text = font.render(exit_message, True, black)
+instruction_text_rect = instruction_text.get_rect(center=(window_width // 2, window_height // 2 - 20))
+enter_text_rect = enter_text.get_rect(center=(window_width // 2, window_height // 2 + 20))
+exit_text_rect = exit_text.get_rect(center=(window_width // 2, window_height // 2 + 60))
 
 # Main game loop
 running = True
@@ -68,12 +79,15 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if not game_started and event.key == pygame.K_RETURN:
                 game_started = True
-            elif game_started and event.key == pygame.K_SPACE and not is_jumping:
+            elif game_started and event.key == pygame.K_SPACE and not is_jumping and remaining_flips > 0:
                 velocity = -10
                 is_jumping = True
                 counting_score = True
+                remaining_flips -= 1
             elif event.key == pygame.K_ESCAPE:
                 running = False
+            elif game_over and event.key == pygame.K_r:
+                restart = True
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE:
                 is_jumping = False
@@ -105,8 +119,29 @@ while running:
     if not game_started:
         # Display the instructions message
         window.blit(instruction_text, instruction_text_rect)
-        # Display the start message
-        window.blit(start_text, start_text_rect)
+        window.blit(enter_text, enter_text_rect)
+        window.blit(exit_text, exit_text_rect)
+    elif game_over and restart:
+        # Restart the game
+        game_started = False
+        game_over = False
+        restart = False
+        score = 0
+        rotation_counter = 0
+        remaining_flips = max_flips
+        flip_angle = 0  # Reset flip angle to 0 degrees
+    elif game_over:
+        # Display the game over message with score
+        game_over_message = "Game Over! Your Score: " + str(score)
+        game_over_text = font.render(game_over_message, True, black)
+        game_over_text_rect = game_over_text.get_rect(center=(window_width // 2, window_height // 2 - 20))
+
+        restart_message = "Press R to restart"
+        restart_text = font.render(restart_message, True, black)
+        restart_text_rect = restart_text.get_rect(center=(window_width // 2, window_height // 2 + 20))
+
+        window.blit(game_over_text, game_over_text_rect)
+        window.blit(restart_text, restart_text_rect)
     else:
         # Draw the floor
         floor_color = (160, 160, 160)
@@ -129,6 +164,15 @@ while running:
         rotation_counter_text = font.render("Rotations: " + str(rotation_counter), True, black)
         rotation_counter_text_rect = rotation_counter_text.get_rect(topleft=(10, 10))
         window.blit(rotation_counter_text, rotation_counter_text_rect)
+
+        # Draw the remaining flips counter
+        flips_text = font.render("Flips Remaining: " + str(remaining_flips), True, black)
+        flips_text_rect = flips_text.get_rect(topright=(window_width - 10, 50))
+        window.blit(flips_text, flips_text_rect)
+
+        # Check if the game is over
+        if remaining_flips == 0 and not is_jumping and velocity >= 0 and bottle_y >= window_height - bottle_height:
+            game_over = True
 
     # Update the display
     pygame.display.flip()
