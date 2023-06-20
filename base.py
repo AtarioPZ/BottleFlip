@@ -38,6 +38,9 @@ flip_speed = 10
 score = 0
 counting_score = False
 
+# Set up the rotation counter
+rotation_counter = 0
+
 # Set up the clock
 clock = pygame.time.Clock()
 
@@ -94,6 +97,7 @@ while running:
         flip_angle += flip_speed
         if flip_angle >= 360:
             flip_angle = 0
+            rotation_counter += 1
 
     # Clear the window
     window.fill(white)
@@ -120,6 +124,11 @@ while running:
         score_text = font.render("Score: " + str(score), True, black)
         score_text_rect = score_text.get_rect(topright=(window_width - 10, 10))
         window.blit(score_text, score_text_rect)
+
+        # Draw the rotation counter
+        rotation_counter_text = font.render("Rotations: " + str(rotation_counter), True, black)
+        rotation_counter_text_rect = rotation_counter_text.get_rect(topleft=(10, 10))
+        window.blit(rotation_counter_text, rotation_counter_text_rect)
 
     # Update the display
     pygame.display.flip()
