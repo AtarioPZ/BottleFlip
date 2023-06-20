@@ -160,11 +160,6 @@ while running:
         score_text_rect = score_text.get_rect(topright=(window_width - 10, 10))
         window.blit(score_text, score_text_rect)
 
-        # Draw the rotation counter
-        rotation_counter_text = font.render("Rotations: " + str(rotation_counter), True, black)
-        rotation_counter_text_rect = rotation_counter_text.get_rect(topleft=(10, 10))
-        window.blit(rotation_counter_text, rotation_counter_text_rect)
-
         # Draw the remaining flips counter
         flips_text = font.render("Flips Remaining: " + str(remaining_flips), True, black)
         flips_text_rect = flips_text.get_rect(topright=(window_width - 10, 50))
